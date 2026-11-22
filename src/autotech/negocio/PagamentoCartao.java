@@ -1,4 +1,4 @@
-package autotech;
+package autotech.negocio;
 
 public class PagamentoCartao implements FormaPagamento {
     private static final double ACRESCIMO = 0.03; // 3% de acréscimo no cartão

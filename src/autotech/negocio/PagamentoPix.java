@@ -1,4 +1,4 @@
-package autotech;
+package autotech.negocio;
 
 public class PagamentoPix implements FormaPagamento {
     private static final double DESCONTO = 0.05; // 5% de desconto no Pix

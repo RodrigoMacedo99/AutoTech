@@ -1,9 +1,24 @@
-package autotech;
+package autotech.visao;
 
+import autotech.entidades.Carro;
+import autotech.entidades.Cliente;
+import autotech.entidades.Manutencao;
+import autotech.entidades.Moto;
+import autotech.entidades.Servico;
+import autotech.entidades.Veiculo;
+import autotech.negocio.FormaPagamento;
+import autotech.negocio.GerenciadorOficina;
+import autotech.negocio.PagamentoCartao;
+import autotech.negocio.PagamentoDinheiro;
+import autotech.negocio.PagamentoPix;
+
+import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
+/** Camada de visão: menu interativo no console. Não contém regras de negócio. */
 public class Programa {
     private static final Scanner in = new Scanner(System.in);
     private static final GerenciadorOficina gerenciador = new GerenciadorOficina();
@@ -14,18 +29,26 @@ public class Programa {
         do {
             exibirMenu();
             opcao = lerInt("Escolha uma opção: ");
-            switch (opcao) {
-                case 1 -> cadastrarNovoCliente();
-                case 2 -> incluirVeiculoEManutencao();
-                case 3 -> alterarVeiculo();
-                case 4 -> excluirVeiculo();
-                case 5 -> realizarSaidaEPagamento();
-                case 6 -> buscarVeiculo();
-                case 7 -> listarEOrdenar();
-                case 0 -> System.out.println("Encerrando o AutoTech.");
-                default -> System.out.println("Opção inválida.");
+            try {
+                executar(opcao);
+            } catch (UncheckedIOException e) {
+                System.out.println("Erro de persistência: " + e.getMessage());
             }
         } while (opcao != 0);
+    }
+
+    private static void executar(int opcao) {
+        switch (opcao) {
+            case 1 -> cadastrarNovoCliente();
+            case 2 -> incluirVeiculoEManutencao();
+            case 3 -> alterarVeiculo();
+            case 4 -> excluirVeiculo();
+            case 5 -> realizarSaidaEPagamento();
+            case 6 -> buscarVeiculo();
+            case 7 -> listarEOrdenar();
+            case 0 -> System.out.println("Encerrando o AutoTech.");
+            default -> System.out.println("Opção inválida.");
+        }
     }
 
     private static void exibirMenu() {
@@ -134,10 +157,12 @@ public class Programa {
             System.out.println("Forma de pagamento inválida.");
             return;
         }
-        boolean ok = gerenciador.registrarSaidaVeiculo(placa, pag);
-        System.out.println(ok
-                ? "Saída registrada."
-                : "Veículo não encontrado ou sem manutenção em aberto.");
+        Optional<String> recibo = gerenciador.registrarSaidaVeiculo(placa, pag);
+        if (recibo.isPresent()) {
+            System.out.println("Saída registrada. Recibo gerado: " + recibo.get());
+        } else {
+            System.out.println("Veículo não encontrado ou sem manutenção em aberto.");
+        }
     }
 
     private static void buscarVeiculo() {
@@ -148,16 +173,11 @@ public class Programa {
             if (v == null) {
                 System.out.println("Veículo não encontrado.");
             } else {
-                v.imprimir();
+                FormatadorVeiculo.imprimirDetalhado(v);
             }
         } else if (opcao == 2) {
             List<Veiculo> encontrados = gerenciador.buscarPorModelo(lerTexto("Modelo: "));
-            if (encontrados.isEmpty()) {
-                System.out.println("Nenhum veículo encontrado.");
-            } else {
-                System.out.println(GerenciadorOficina.CABECALHO_TABELA);
-                encontrados.forEach(v -> System.out.println(v.getLinhaTabela()));
-            }
+            FormatadorVeiculo.imprimirTabela(encontrados);
         } else {
             System.out.println("Opção inválida.");
         }
@@ -167,14 +187,14 @@ public class Programa {
         System.out.println("1 - Listar | 2 - Ordenar por preço | 3 - Ordenar por ano");
         int opcao = lerInt("Escolha: ");
         switch (opcao) {
-            case 1 -> gerenciador.listarTodosTabular();
+            case 1 -> FormatadorVeiculo.imprimirTabela(gerenciador.getVeiculos());
             case 2 -> {
                 gerenciador.ordenarPorPreco();
-                gerenciador.listarTodosTabular();
+                FormatadorVeiculo.imprimirTabela(gerenciador.getVeiculos());
             }
             case 3 -> {
                 gerenciador.ordenarPorAno();
-                gerenciador.listarTodosTabular();
+                FormatadorVeiculo.imprimirTabela(gerenciador.getVeiculos());
             }
             default -> System.out.println("Opção inválida.");
         }

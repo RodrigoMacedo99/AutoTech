@@ -1,4 +1,4 @@
-package autotech;
+package autotech.entidades;
 
 public class Motor {
     private String tipoCombustivel;

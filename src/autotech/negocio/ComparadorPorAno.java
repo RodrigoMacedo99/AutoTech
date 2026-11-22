@@ -1,4 +1,6 @@
-package autotech;
+package autotech.negocio;
+
+import autotech.entidades.Veiculo;
 
 import java.util.Comparator;
 

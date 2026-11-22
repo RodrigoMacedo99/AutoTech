@@ -1,4 +1,4 @@
-package autotech;
+package autotech.entidades;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

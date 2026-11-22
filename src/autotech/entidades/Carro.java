@@ -1,4 +1,4 @@
-package autotech;
+package autotech.entidades;
 
 public class Carro extends Veiculo {
     private int numeroPortas;
@@ -30,12 +30,5 @@ public class Carro extends Veiculo {
     @Override
     public String frear() {
         return "Carro freando";
-    }
-
-    @Override
-    public String getLinhaTabela() {
-        return String.format("%-6s %-9s %-14s %-12s %-6d %12.2f %-22s %d portas",
-                getTipoVeiculo(), placa, marca, modelo, anoFabricacao, preco,
-                getCliente().getNome(), numeroPortas);
     }
 }

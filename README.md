@@ -2,7 +2,7 @@
 
 Sistema de linha de comando para gerenciamento de uma oficina mecânica. Permite cadastrar clientes, registrar a entrada de veículos (carros e motos) com suas manutenções, calcular o valor de saída com diferentes formas de pagamento, buscar, alterar, remover e ordenar veículos.
 
-O projeto foi modelado a partir de um diagrama de classes UML (PlantUML) e implementado em Java.
+O projeto foi modelado a partir de um diagrama de classes UML (PlantUML) e implementado em Java, organizado em camadas.
 
 ## Requisitos
 
@@ -16,31 +16,39 @@ AutoTech/
 ├── README.md
 └── src/
     └── autotech/
-        ├── Programa.java            # Ponto de entrada (menu interativo)
-        ├── GerenciadorOficina.java  # Regras de negócio e coleções de veículos/clientes
-        ├── Veiculo.java             # Classe abstrata base dos veículos
-        ├── Carro.java
-        ├── Moto.java
-        ├── Cliente.java
-        ├── Motor.java
-        ├── Manutencao.java
-        ├── Servico.java
-        ├── Imprimivel.java          # Interface: getLinhaTabela() e imprimir()
-        ├── FormaPagamento.java      # Interface: calcularValorFinal() e gerarComprovante()
-        ├── PagamentoPix.java
-        ├── PagamentoCartao.java
-        ├── PagamentoDinheiro.java
-        ├── ComparadorPorPreco.java  # Comparator<Veiculo>
-        └── ComparadorPorAno.java    # Comparator<Veiculo>
+        ├── entidades/        # Modelo de domínio (sem I/O)
+        │   ├── Cliente.java
+        │   ├── Motor.java
+        │   ├── Servico.java
+        │   ├── Manutencao.java
+        │   ├── Veiculo.java      # Classe abstrata base dos veículos
+        │   ├── Carro.java
+        │   └── Moto.java
+        ├── negocio/          # Regras de negócio e casos de uso
+        │   ├── GerenciadorOficina.java
+        │   ├── FormaPagamento.java   # Interface (estratégia de pagamento)
+        │   ├── PagamentoPix.java
+        │   ├── PagamentoCartao.java
+        │   ├── PagamentoDinheiro.java
+        │   ├── ComparadorPorPreco.java
+        │   └── ComparadorPorAno.java
+        ├── persistencia/     # Gravação em arquivos
+        │   ├── ArquivoManutencoes.java
+        │   └── ArquivoRecibos.java
+        └── visao/            # Interface de console
+            ├── Programa.java         # Ponto de entrada (menu interativo)
+            └── FormatadorVeiculo.java
 ```
+
+Dependências entre camadas: `visao` → `negocio` → `persistencia` → `entidades`. As entidades não dependem de nenhuma outra camada.
 
 ## Como compilar e executar
 
 Na raiz do projeto:
 
 ```bash
-javac -d out src/autotech/*.java
-java -cp out autotech.Programa
+javac -d out $(find src -name '*.java')
+java -cp out autotech.visao.Programa
 ```
 
 Ao iniciar, o sistema carrega automaticamente **14 veículos** de exemplo (7 carros e 7 motos), cada um com um cliente fictício.
@@ -97,11 +105,29 @@ Os arquivos são criados no diretório de execução:
 
 ## Arquitetura
 
-- **`Veiculo`** é abstrata e implementa `Imprimivel`. `Carro` (com número de portas) e `Moto` (com cilindradas) são as especializações. Cada veículo possui um `Motor` próprio e um `Cliente` associado, e mantém o histórico de `Manutencao`.
-- **`Manutencao`** agrega `Servico`s e controla as datas de entrada e saída. A manutenção "em aberto" é aquela sem data de saída.
-- **`FormaPagamento`** define a estratégia de cálculo do valor final e de geração de comprovante. As três implementações são intercambiáveis.
-- **`GerenciadorOficina`** concentra as operações sobre as listas de veículos e clientes, além da persistência em arquivo.
+### Entidades (`entidades`)
+
+- **`Veiculo`** é abstrata. `Carro` (com número de portas) e `Moto` (com cilindradas) são as especializações. Cada veículo possui um `Motor` próprio e um `Cliente` associado, e mantém o histórico de `Manutencao`.
+- **`Manutencao`** agrega `Servico`s e controla as datas de entrada e saída. A manutenção "em aberta" é aquela sem data de saída.
+- **`Servico`** define seu preço pelo tipo.
+
+### Negócio (`negocio`)
+
+- **`GerenciadorOficina`** concentra as operações sobre veículos e clientes (cadastro, entrada, saída, busca, alteração, remoção e ordenação). É o único ponto que a visão chama.
+- **`FormaPagamento`** é a estratégia de cálculo do valor final e de geração de comprovante. As três implementações são intercambiáveis.
 - **`ComparadorPorPreco`** e **`ComparadorPorAno`** são usados para ordenação.
+
+### Persistência (`persistencia`)
+
+- **`ArquivoManutencoes`** grava o histórico de manutenções em `manutencoes.txt`.
+- **`ArquivoRecibos`** gera o recibo de saída em arquivo de texto.
+
+Erros de escrita são lançados como `UncheckedIOException` e tratados pela visão, que os exibe ao usuário.
+
+### Visão (`visao`)
+
+- **`Programa`** contém o menu e a leitura da entrada. Não contém regras de negócio.
+- **`FormatadorVeiculo`** monta as linhas de tabela e a exibição detalhada dos veículos.
 
 ## Observações
 

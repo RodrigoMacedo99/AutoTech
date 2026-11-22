@@ -1,4 +1,4 @@
-package autotech;
+package autotech.entidades;
 
 public class Moto extends Veiculo {
     private int cilindradas;
@@ -30,12 +30,5 @@ public class Moto extends Veiculo {
     @Override
     public String frear() {
         return "Moto freando";
-    }
-
-    @Override
-    public String getLinhaTabela() {
-        return String.format("%-6s %-9s %-14s %-12s %-6d %12.2f %-22s %d cc",
-                getTipoVeiculo(), placa, marca, modelo, anoFabricacao, preco,
-                getCliente().getNome(), cilindradas);
     }
 }

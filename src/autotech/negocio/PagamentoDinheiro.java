@@ -1,4 +1,4 @@
-package autotech;
+package autotech.negocio;
 
 public class PagamentoDinheiro implements FormaPagamento {
     private static final double DESCONTO = 0.10; // 10% de desconto em dinheiro

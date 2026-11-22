@@ -1,15 +1,15 @@
-package autotech;
+package autotech.entidades;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class Veiculo implements Imprimivel {
-    protected String placa;
-    protected String marca;
-    protected String modelo;
-    protected int anoFabricacao;
-    protected double preco;
+public abstract class Veiculo {
+    private String placa;
+    private String marca;
+    private String modelo;
+    private int anoFabricacao;
+    private double preco;
     private final Motor motor;
     private final Cliente cliente;
     private final List<Manutencao> historicoManutencoes = new ArrayList<>();
@@ -40,26 +40,11 @@ public abstract class Veiculo implements Imprimivel {
         return null;
     }
 
-    @Override
-    public void imprimir() {
-        System.out.println("=== " + getTipoVeiculo() + " ===");
-        System.out.println("Placa: " + placa + " | " + marca + " " + modelo + " (" + anoFabricacao + ")");
-        System.out.printf("Preço: R$ %.2f%n", preco);
-        System.out.println("Motor: " + motor.getTipoCombustivel() + " - " + motor.getPotenciaCV() + " CV");
-        System.out.println("Cliente: " + cliente.getNome() + " (CPF " + cliente.getCpf() + ")");
-        System.out.println("Manutenções registradas: " + historicoManutencoes.size());
-    }
-
     public abstract String getTipoVeiculo();
 
     public abstract String acelerar();
 
     public abstract String frear();
-
-    @Override
-    public abstract String getLinhaTabela();
-
-    // Getters e setters adicionais necessários para o gerenciador
 
     public String getPlaca() {
         return placa;

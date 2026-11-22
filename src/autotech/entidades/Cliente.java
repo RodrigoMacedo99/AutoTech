@@ -1,4 +1,4 @@
-package autotech;
+package autotech.entidades;
 
 public class Cliente {
     private final String cpf;

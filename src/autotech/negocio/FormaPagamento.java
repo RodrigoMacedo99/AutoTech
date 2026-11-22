@@ -1,4 +1,4 @@
-package autotech;
+package autotech.negocio;
 
 public interface FormaPagamento {
     double calcularValorFinal(double valorBase);
