@@ -1,31 +1,26 @@
 package autotech.entidades;
 
+import java.time.LocalDate;
+
+/**
+ * Item do catálogo de serviços, com preço tabelado.
+ * Alterações de preço não modificam o objeto: é criada uma nova entrada com nova dataVigencia,
+ * preservando o histórico.
+ */
 public class Servico {
     private final String tipoServico;
     private final String descricao;
-    private final double preco;
+    private final double precoTabelado;
+    private final LocalDate dataVigencia;
 
-    public Servico(String tipoServico, String descricao) {
+    public Servico(String tipoServico, String descricao, double precoTabelado, LocalDate dataVigencia) {
+        if (precoTabelado < 0) {
+            throw new IllegalArgumentException("preço não pode ser negativo");
+        }
         this.tipoServico = tipoServico;
         this.descricao = descricao;
-        this.preco = definirPrecoPorTipo(tipoServico);
-    }
-
-    private double definirPrecoPorTipo(String tipo) {
-        switch (tipo.trim().toLowerCase()) {
-            case "troca de óleo":
-                return 150.0;
-            case "revisão":
-                return 350.0;
-            case "freio":
-                return 280.0;
-            case "alinhamento":
-                return 120.0;
-            case "troca de pneus":
-                return 400.0;
-            default:
-                return 200.0;
-        }
+        this.precoTabelado = precoTabelado;
+        this.dataVigencia = dataVigencia;
     }
 
     public String getTipoServico() {
@@ -36,7 +31,11 @@ public class Servico {
         return descricao;
     }
 
-    public double getPreco() {
-        return preco;
+    public double getPrecoTabelado() {
+        return precoTabelado;
+    }
+
+    public LocalDate getDataVigencia() {
+        return dataVigencia;
     }
 }

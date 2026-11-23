@@ -1,6 +1,7 @@
 package autotech.visao;
 
 import autotech.entidades.Carro;
+import autotech.entidades.Manutencao;
 import autotech.entidades.Moto;
 import autotech.entidades.Veiculo;
 
@@ -34,7 +35,21 @@ public final class FormatadorVeiculo {
         System.out.println("Motor: " + v.getMotor().getTipoCombustivel() + " - "
                 + v.getMotor().getPotenciaCV() + " CV");
         System.out.println("Cliente: " + v.getCliente().getNome() + " (CPF " + v.getCliente().getCpf() + ")");
-        System.out.println("Manutenções registradas: " + v.getHistoricoManutencoes().size());
+        System.out.println("Histórico de manutenções: " + v.getHistoricoManutencoes().size());
+        double totalGasto = 0;
+        for (Manutencao m : v.getHistoricoManutencoes()) {
+            if (m.getDataSaida() == null) {
+                System.out.printf("  #%d  entrada %s  EM ABERTO  previsto R$ %.2f%n",
+                        m.getId(), m.getDataEntrada(), m.calcularTotal());
+            } else {
+                String ajuste = m.getAjuste() < 0 ? "desconto" : "juros/acréscimo";
+                System.out.printf("  #%d  entrada %s  saída %s  base R$ %.2f  %s R$ %.2f  pago R$ %.2f via %s%n",
+                        m.getId(), m.getDataEntrada(), m.getDataSaida(), m.getValorBase(),
+                        ajuste, Math.abs(m.getAjuste()), m.getValorPago(), m.getFormaPagamento());
+                totalGasto += m.getValorPago();
+            }
+        }
+        System.out.printf("Total gasto (manutenções concluídas): R$ %.2f%n", totalGasto);
     }
 
     public static void imprimirTabela(Iterable<Veiculo> veiculos) {

@@ -4,6 +4,11 @@ public class PagamentoCartao implements FormaPagamento {
     private static final double ACRESCIMO = 0.03; // 3% de acréscimo no cartão
 
     @Override
+    public String getNome() {
+        return "Cartão";
+    }
+
+    @Override
     public double calcularValorFinal(double valorBase) {
         return valorBase * (1 + ACRESCIMO);
     }
